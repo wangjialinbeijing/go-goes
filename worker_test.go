@@ -1,4 +1,4 @@
-package goes
+package gos
 
 import (
 	"testing"

@@ -1,4 +1,4 @@
-package goes
+package gos
 
 import (
 	"testing"
@@ -20,7 +20,7 @@ func init() {
 }
 
 func TestAddTask(t *testing.T) {
-	god := NewDispatcher(100, 10)
+	god := NewGos(100, 10)
 	god.Start()
 	defer god.Shutdown()
 
@@ -40,7 +40,7 @@ func TestAddTask(t *testing.T) {
 }
 
 func TestTask2(t *testing.T) {
-	dispatcher := NewDispatcher(100, 10)
+	dispatcher := NewGos(100, 10)
 	dispatcher.Start()
 	defer dispatcher.Shutdown()
 
@@ -73,7 +73,7 @@ func Benchmark1KWorkers(b *testing.B) {
 }
 
 func MakeBenchmarkWith(numWorkers int,b *testing.B) {
-	dispatcher := NewDispatcher(numWorkers, numWorkers)
+	dispatcher := NewGos(numWorkers, numWorkers)
 	dispatcher.Start()
 	defer dispatcher.Shutdown()
 

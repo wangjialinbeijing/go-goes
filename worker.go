@@ -1,4 +1,4 @@
-package goes
+package gos
 
 //
 // Author: 陈永佳 chenyongjia@parkingwang.com, yoojiachen@gmail.com
