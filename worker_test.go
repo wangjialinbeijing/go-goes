@@ -1,4 +1,4 @@
-package gos
+package goes
 
 import (
 	"testing"
@@ -14,13 +14,13 @@ func TestWorker_Run(t *testing.T) {
 	defer close(w.stop)
 
 	isNotify := false
-	w.idleNotify = func(w *worker) {
+	w.onIdle = func(w *worker) {
 		isNotify = true
 	}
 	w.Run()
 
 	done := make(chan bool)
-	w.taskQueue <- func() {
+	w.tasks <- func() {
 		done <- true
 	}
 
@@ -32,7 +32,7 @@ func TestWorker_Run(t *testing.T) {
 
 	if !isNotify {
 		t.Error("Notify not call")
-	}else{
+	} else {
 		t.Log("Test ok")
 	}
 }
@@ -40,13 +40,13 @@ func TestWorker_Run(t *testing.T) {
 func BenchmarkWorker(b *testing.B) {
 	w := newWorker()
 	defer close(w.stop)
-	w.idleNotify = func(w *worker) {}
+	w.onIdle = func(w *worker) {}
 	w.Run()
 
 	count := 0
 	for i := 0; i < b.N; i++ {
-		w.taskQueue <- func() {
-			count ++
+		w.tasks <- func() {
+			count++
 		}
 	}
 }

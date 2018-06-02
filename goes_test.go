@@ -1,11 +1,11 @@
-package gos
+package goes
 
 import (
-	"testing"
+	"runtime"
 	"strconv"
 	"sync"
+	"testing"
 	"time"
-	"runtime"
 )
 
 //
@@ -20,7 +20,7 @@ func init() {
 }
 
 func TestAddTask(t *testing.T) {
-	god := NewGos(100, 10)
+	god := NewGoesPool(100, 10)
 	god.Start()
 	defer god.Shutdown()
 
@@ -40,13 +40,13 @@ func TestAddTask(t *testing.T) {
 }
 
 func TestTask2(t *testing.T) {
-	dispatcher := NewGos(100, 10)
+	dispatcher := NewGoesPool(100, 10)
 	dispatcher.Start()
 	defer dispatcher.Shutdown()
 
 	wg := new(sync.WaitGroup)
 
-	TASKS := int(1000*100)
+	TASKS := int(1000 * 100)
 	for i := 0; i < TASKS; i++ {
 		wg.Add(1)
 		dispatcher.Add(func() {
@@ -72,8 +72,8 @@ func Benchmark1KWorkers(b *testing.B) {
 	MakeBenchmarkWith(1000, b)
 }
 
-func MakeBenchmarkWith(numWorkers int,b *testing.B) {
-	dispatcher := NewGos(numWorkers, numWorkers)
+func MakeBenchmarkWith(numWorkers int, b *testing.B) {
+	dispatcher := NewGoesPool(numWorkers, numWorkers)
 	dispatcher.Start()
 	defer dispatcher.Shutdown()
 
