@@ -4,9 +4,9 @@ package gos
 // Author: 陈永佳 yoojiachen@gmail.com
 //
 
-// Dispatcher内部维护一组Worker。
+// Goes内部维护一组Worker。
 // 如果接收到外部任务，向空闲Worker发送任务
-type Gos struct {
+type Goes struct {
 	workers    []*worker     // 所有Worker
 	ready      chan *worker  // 空闲
 	tasks      chan GoTask   // 待调度任务列表
@@ -14,7 +14,7 @@ type Gos struct {
 	terminated chan struct{} // 终止状态
 }
 
-func (slf *Gos) Start() {
+func (slf *Goes) Start() {
 	go func() {
 		for {
 			select {
@@ -37,21 +37,21 @@ func (slf *Gos) Start() {
 }
 
 // 关闭Go调度器，等待所有Go协程完成后返回
-func (slf *Gos) Shutdown() {
+func (slf *Goes) Shutdown() {
 	close(slf.stop)
 	// 等待所有任务完成
 	<-slf.terminated
 }
 
 // 添加需要调度的任务
-func (slf *Gos) Add(task GoTask) {
+func (slf *Goes) Add(task GoTask) {
 	slf.tasks <- task
 }
 
-func NewGos(numWorkers int, taskQueueSize int) *Gos {
+func NewGos(numWorkers int, taskQueueSize int) *Goes {
 	numWorkers = max(1, numWorkers)
 	taskQueueSize = max(1, taskQueueSize)
-	d := &Gos{
+	d := &Goes{
 		workers:    make([]*worker, numWorkers),
 		ready:      make(chan *worker, numWorkers),
 		tasks:      make(chan GoTask, taskQueueSize),
