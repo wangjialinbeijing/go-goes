@@ -13,11 +13,8 @@ func TestWorker_Run(t *testing.T) {
 	w := newWorker()
 	defer close(w.tasks)
 
-	isNotify := false
-	w.onIdle = func(w *worker) {
-		isNotify = true
-	}
-	go w.startWork()
+	idles := make(chan *worker, 1)
+	go w.work(idles)
 
 	done := make(chan bool)
 	w.tasks <- func() {
@@ -30,10 +27,12 @@ func TestWorker_Run(t *testing.T) {
 
 	<-done
 
-	if !isNotify {
-		t.Error("Notify not call")
-	} else {
+	select {
+	case <-idles:
 		t.Log("Test ok")
+
+	default:
+		t.Error("Notify idle not call")
 	}
 }
 
@@ -41,8 +40,8 @@ func BenchmarkWorker(b *testing.B) {
 	w := newWorker()
 	defer close(w.tasks)
 
-	w.onIdle = func(w *worker) {}
-	go w.startWork()
+	idles := make(chan *worker, b.N)
+	go w.work(idles)
 
 	count := 0
 	for i := 0; i < b.N; i++ {

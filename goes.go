@@ -54,7 +54,7 @@ func NewGoesPoolDefault(numWorkers int) *GoesPool {
 func NewGoesPool(numWorkers int, taskQueueSize int) *GoesPool {
 	numWorkers = max(1, numWorkers)
 	taskQueueSize = max(1, taskQueueSize)
-	pool := &GoesPool{
+	goes := &GoesPool{
 		workers:     make([]*worker, numWorkers),
 		idles:       make(chan *worker, numWorkers),
 		tasksQueue:  make(chan GoTask, taskQueueSize),
@@ -62,18 +62,14 @@ func NewGoesPool(numWorkers int, taskQueueSize int) *GoesPool {
 	}
 
 	// 初始化Worker列表
-	idleToReady := func(worker *worker) {
-		pool.idles <- worker
-	}
 	for i := 0; i < numWorkers; i++ {
 		worker := newWorker()
-		worker.onIdle = idleToReady
-		go worker.startWork()
-		pool.workers[i] = worker
-		pool.idles <- worker
+		go worker.work(goes.idles)
+		goes.workers[i] = worker
+		goes.idles <- worker
 	}
 
-	return pool
+	return goes
 }
 
 func max(a int, b int) int {

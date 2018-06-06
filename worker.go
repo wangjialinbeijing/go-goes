@@ -9,16 +9,21 @@ type GoTask func() // 任务
 // Worker包含一个任务列表和停止控制信号
 type worker struct {
 	tasks    chan GoTask   // 任务列表
-	onIdle   func(*worker) // 完成任务后空闲通知
 	waitExit chan struct{} // 运行状态
 }
 
 // 启动内部协程，异步循环处理任务列表
-func (slf *worker) startWork() {
+func (slf *worker) work(idles chan<- *worker) {
 	defer close(slf.waitExit)
+
+	backToIdles := func() {
+		idles <- slf
+	}
+
 	for taskFunc := range slf.tasks {
 		func() {
-			defer slf.onIdle(slf)
+			defer backToIdles()
+
 			taskFunc()
 		}()
 	}
