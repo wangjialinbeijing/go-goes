@@ -11,13 +11,13 @@ import (
 
 func TestWorker_Run(t *testing.T) {
 	w := newWorker()
-	defer close(w.stop)
+	defer close(w.tasks)
 
 	isNotify := false
 	w.onIdle = func(w *worker) {
 		isNotify = true
 	}
-	w.Run()
+	go w.startWork()
 
 	done := make(chan bool)
 	w.tasks <- func() {
@@ -39,9 +39,10 @@ func TestWorker_Run(t *testing.T) {
 
 func BenchmarkWorker(b *testing.B) {
 	w := newWorker()
-	defer close(w.stop)
+	defer close(w.tasks)
+
 	w.onIdle = func(w *worker) {}
-	w.Run()
+	go w.startWork()
 
 	count := 0
 	for i := 0; i < b.N; i++ {

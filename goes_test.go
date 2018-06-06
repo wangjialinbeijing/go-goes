@@ -20,14 +20,14 @@ func init() {
 }
 
 func TestAddTask(t *testing.T) {
-	god := NewGoesPool(100, 10)
-	god.Start()
-	defer god.Shutdown()
+	goes := NewGoesPoolDefault(10)
+	goes.Start()
+	defer goes.Shutdown()
 
 	done := make(chan bool)
 	scheduled := false
 
-	god.Add(func() {
+	goes.Add(func() {
 		println("Called")
 		scheduled = true
 		close(done)
@@ -40,16 +40,16 @@ func TestAddTask(t *testing.T) {
 }
 
 func TestTask2(t *testing.T) {
-	dispatcher := NewGoesPool(100, 10)
-	dispatcher.Start()
-	defer dispatcher.Shutdown()
+	goes := NewGoesPoolDefault(100)
+	goes.Start()
+	defer goes.Shutdown()
 
 	wg := new(sync.WaitGroup)
 
 	TASKS := int(1000 * 100)
 	for i := 0; i < TASKS; i++ {
 		wg.Add(1)
-		dispatcher.Add(func() {
+		goes.Add(func() {
 			wg.Done()
 		})
 	}
@@ -73,13 +73,13 @@ func Benchmark1KWorkers(b *testing.B) {
 }
 
 func MakeBenchmarkWith(numWorkers int, b *testing.B) {
-	dispatcher := NewGoesPool(numWorkers, numWorkers)
-	dispatcher.Start()
-	defer dispatcher.Shutdown()
+	goes := NewGoesPool(numWorkers, numWorkers)
+	goes.Start()
+	defer goes.Shutdown()
 
 	count := 0
 	for i := 0; i < b.N; i++ {
-		dispatcher.Add(func() {
+		goes.Add(func() {
 			count++
 		})
 	}
