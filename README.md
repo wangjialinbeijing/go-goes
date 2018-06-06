@@ -6,6 +6,14 @@
 
 > go get -u github.com/yoojia/go-goes
 
+## Dep
+
+```toml
+[[constraint]]
+  name = "github.com/yoojia/go-goes"
+  version = "0.1.0"
+```
+
 ## Usage
 
 三个步骤：
