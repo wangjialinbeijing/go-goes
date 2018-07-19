@@ -16,13 +16,14 @@ type worker struct {
 func (slf *worker) work(idles chan<- *worker) {
 	defer close(slf.waitExit)
 
-	backToIdles := func() {
+	finishTask := func() {
 		idles <- slf
 	}
 
 	for taskFunc := range slf.tasks {
 		func() {
-			defer backToIdles()
+			// 完成一个任务后，将当前Worker恢复到空闲状态
+			defer finishTask()
 
 			taskFunc()
 		}()
