@@ -50,7 +50,7 @@ func (slf *GoesPool) Add(task GoTask) {
 
 // NewGoesPool 创建一个GoesPool新对象指针，指定内部Worker协程的数量。
 func NewGoesPoolDefault(numWorkers int) *GoesPool {
-	return NewGoesPool(numWorkers, numWorkers/2)
+	return NewGoesPool(numWorkers, max(1, numWorkers/2))
 }
 
 // NewGoesPool 创建一个GoesPool新对象指针，指定内部Worker协程的数量及Task任务列表容量。
